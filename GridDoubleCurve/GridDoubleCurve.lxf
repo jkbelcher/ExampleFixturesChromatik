@@ -1,0 +1,56 @@
+{
+  /* Example Fixture: Grid that curves in two axes
+  
+     Grid is oriented in the X-Y plane.
+     Fixed overall length and number of pixels in each direction.
+     Output assumes LED strings are run vertically.
+     Each LED string is given a new artnet/sacn universe.
+     
+     Length is the direct distance between start and end points.
+  */
+  
+  label: "GridDoubleCurve",
+  tag: "gridDouble",
+  
+  "parameters": {
+    /* Curve1 is the Y axis */
+    "length1": { type: "float", default: 40 },
+    "radius1": { type: "float", default: 48 },
+    "numPoints1": { type: "int", min: 2, default: 20 },
+  
+    /* Curve2 is the X axis */
+    "length2": { type: "float", default: 40 },
+    "radius2": { type: "float", default: 48 },
+    "numPoints2": { type: "int", min: 2, default: 20 },
+
+  	"host": { type: "string", default: "192.168.1.10" },
+    "port": { type: "int", default: 7890 },
+    "protocol": { type: "string", default: "artnet", options: ["artnet", "sacn"] },
+  	"universe": { type: "int", default: 0 },
+    "channel": { type: "int", default: 0 },
+	  "byteOrder": { type: "string", default: "RGB", options: ["RGB","GRB","RBG","BGR","BRG","GBR"] }
+  },
+  
+  "components": [
+    { type: "StripCurved",
+      instances: "$numPoints2",
+      length: "$length1",
+      radius: "$radius1",
+      numPoints: "$numPoints1",
+      transforms: [
+        { pitch: -90 },
+        { x: "$length2/2" },
+        { y: "$length2/2/tan((180-(asin($length2/2/$radius2)))/2)-$radius2" },
+        { roll: "asin($length2/2/$radius2)" },
+        { roll: "0-asin($length2/2/$radius2)*2/($numPoints2-1)*$instance" },
+        { y: "$radius2" },
+        { pitch: 90 },
+        { roll: 90 },
+        { pitch: -90 },
+      ],
+      outputs: [
+        { host: "$host", protocol: "$protocol", universe: "$universe+$instance", channel: "$channel", byteOrder: "$byteOrder" }
+      ]
+    }
+  ]
+}

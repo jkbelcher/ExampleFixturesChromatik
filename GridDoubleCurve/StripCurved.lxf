@@ -1,0 +1,30 @@
+{
+  /* Example Fixture: Strip that curves around a radius
+  
+     Length is the direct distance from the first to last point.
+     Changing the radius does not affect length.
+     Radius must be >= length/2.
+  */
+  
+  label: "StripCurved",
+  tag: "stripCurved",
+  
+  "parameters": {
+    "length": { type: "float", default: 40 },
+	  "radius": { type: "float", default: 48 },
+    "numPoints": { type: "int", min: 2, default: 20 }
+  },
+  
+  "components": [
+    { type: "point",
+      instances: "$numPoints",
+      transforms: [
+        { x: "$length/2" },
+        { y: "$length/2/tan((180-(asin($length/2/$radius)))/2)-$radius" },
+        { roll: "asin($length/2/$radius)" },
+        { roll: "0-asin($length/2/$radius)*2/($numPoints-1)*$instance" },
+        { y: "$radius" }
+      ]
+    }
+  ]
+}
